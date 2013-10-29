@@ -36,6 +36,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--force', action='store_true', help='Force cron runs'),
         make_option('--silent', action='store_true', help='Do not push any message on console'),
+        make_option('--release-lock', action='store_true', help='Releases a cache lock. Use it when you sure that there are no cron commands are running.'),
     )
 
     def handle(self, *args, **options):
@@ -54,6 +55,12 @@ class Command(BaseCommand):
             error = traceback.format_exc()
             print 'Make sure these are valid cron class names: %s\n%s' % (cron_class_names, error)
             sys.exit()
+
+        if options['release_lock']:
+            for cron_class in crons_to_run:
+                cache.delete(cron_class.__name__)
+            close_connection()
+            return
 
         for cron_class in crons_to_run:
             run_cron_with_cache_check(cron_class, force=options['force'],
