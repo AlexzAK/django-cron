@@ -61,6 +61,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
         if options['release_lock']:
+            log.info('Called with --release-lock option. Releasing cache lock...')
             for cron_class in crons_to_run:
                 cache.delete(cron_class.__name__)
             close_connection()
