@@ -11,6 +11,8 @@ except ImportError:
     # timezone added in Django 1.4
     import timezone
 
+log = logging.getLogger('django_cron')
+
 
 class Schedule(object):
     def __init__(self, run_every_mins=None, run_at_times=[], retry_after_failure_mins=None):
@@ -89,7 +91,7 @@ class CronJobManager(object):
         if not isinstance(cron_job, CronJobBase):
             raise Exception, 'The cron_job to be run should be a subclass of %s' % CronJobBase.__class__
         if CronJobManager.__should_run_now(cron_job, force):
-            logging.debug("Running cron: %s" % cron_job)
+            log.debug("Running cron: %s" % cron_job)
             cron_log = CronJobLog(code=cron_job.code, start_time=timezone.now())
             try:
                 msg = cron_job.do()
@@ -99,7 +101,7 @@ class CronJobManager(object):
                 error = traceback.format_exc()
                 if not silent:
                     print error
-                    logging.error(error)
+                    log.error(error)
                 cron_log.is_success = False
                 cron_log.message = error[-1000:]
             cron_log.ran_at_time = self.user_time if self.user_time else None

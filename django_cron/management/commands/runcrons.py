@@ -16,6 +16,7 @@ except ImportError:
 from django.db import close_connection
 
 
+log = logging.getLogger('django_cron')
 DEFAULT_LOCK_TIME = 24 * 60 * 60  # 24 hours
 
 
@@ -56,7 +57,7 @@ class Command(BaseCommand):
             error = traceback.format_exc()
             msg = 'Make sure these are valid cron class names: %s\n%s' % (cron_class_names, error)
             print msg
-            logging.error(msg)
+            log.error(msg)
             sys.exit(1)
 
         if options['release_lock']:
@@ -92,4 +93,4 @@ def run_cron_with_cache_check(cron_class, force=False, silent=False):
             msg = "%s failed: lock has been found. Other cron started at %s" % \
                 (cron_class.__name__, cache.get(cron_class.__name__))
             print msg
-            logging.warning(msg)
+            log.warning(msg)
