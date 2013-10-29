@@ -99,6 +99,7 @@ class CronJobManager(object):
                 error = traceback.format_exc()
                 if not silent:
                     print error
+                    logging.error(error)
                 cron_log.is_success = False
                 cron_log.message = error[-1000:]
             cron_log.ran_at_time = self.user_time if self.user_time else None
